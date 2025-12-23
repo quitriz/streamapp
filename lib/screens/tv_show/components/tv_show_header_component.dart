@@ -243,6 +243,7 @@ class TvShowHeaderComponentState extends State<TvShowHeaderComponent> {
     final String streamUrl = _episodeChoiceStreamUrl(episode);
     if (episode.adConfiguration != null && streamUrl.isNotEmpty) {
       return AdVideoPlayerWidget(
+        key: ValueKey('ep-ad-${episode.id}-${streamUrl}'),
         streamUrl: streamUrl,
         adConfig: episode.adConfiguration,
         title: episode.title.validate(),
@@ -256,6 +257,7 @@ class TvShowHeaderComponentState extends State<TvShowHeaderComponent> {
     if (!_hasEpisodeStreamSource(episode)) return _buildTrailerThumbnailSequence();
 
     return VideoContentWidget(
+      key: ValueKey('ep-${episode.id}-${streamUrl}-${episode.choice}'),
       choice: episode.choice.validate(),
       image: episode.image.validate(),
       urlLink: _episodeChoiceUrl(episode),
@@ -310,6 +312,7 @@ class TvShowHeaderComponentState extends State<TvShowHeaderComponent> {
         if (_hasShowStreamSource) {
           if (widget.show.adConfiguration != null && _getStreamUrl().isNotEmpty) {
             return AdVideoPlayerWidget(
+              key: ValueKey('show-ad-${widget.show.id}-${_getStreamUrl()}'),
               streamUrl: _getStreamUrl(),
               adConfig: widget.show.adConfiguration,
               title: widget.show.title.validate(),
@@ -321,6 +324,7 @@ class TvShowHeaderComponentState extends State<TvShowHeaderComponent> {
           }
 
           return VideoContentWidget(
+            key: ValueKey('show-${widget.show.id}-${_getStreamUrl()}-${_showChoice}'),
             choice: _showChoice,
             image: widget.show.image.validate(),
             urlLink: _showChoiceUrl(),
