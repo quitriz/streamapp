@@ -143,6 +143,30 @@ class _VideoPlayerWidgetState extends State<VideoPlayerWidget> {
   @override
   void didUpdateWidget(VideoPlayerWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
+
+    // Reinitialize player when source changes to ensure new streams load
+    final bool sourceChanged = oldWidget.videoURL != widget.videoURL || oldWidget.videoURLType != widget.videoURLType || oldWidget.videoId != widget.videoId;
+    if (sourceChanged) {
+      _stopFullscreenStateChecker();
+      _stopSessionValidationTimer();
+      try {
+        podPlayerController.removeListener(_videoPlayerListener);
+      } catch (e) {
+        log('Error removing listener during reinit: $e');
+      }
+      podPlayerController.dispose();
+
+      _isCallbackSent = false;
+      isFirstTime = true;
+
+      if (widget.videoType == PostType.CHANNEL) {
+        _initializeLiveStreamPlayer();
+      } else {
+        _initializeRegularPlayer();
+      }
+      return;
+    }
+
     // Handle watchedTime changes after initialization
     if (oldWidget.watchedTime != widget.watchedTime && widget.watchedTime.isNotEmpty && !widget.isTrailer && widget.videoType != PostType.CHANNEL && podPlayerController.isInitialised) {
       try {

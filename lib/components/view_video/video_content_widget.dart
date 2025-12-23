@@ -27,6 +27,7 @@ class VideoContentWidget extends StatelessWidget {
   final ValueChanged<VideoPlaybackHandle>? onPlaybackHandleReady;
 
   VideoContentWidget({
+    Key? key,
     required this.choice,
     required this.urlLink,
     this.embedContent,
@@ -39,7 +40,7 @@ class VideoContentWidget extends StatelessWidget {
     this.onMovieCompleted,
     required this.postType,
     this.onPlaybackHandleReady,
-  });
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

@@ -21,11 +21,11 @@ class VideoWidget extends StatelessWidget {
   final bool isSlider;
   final bool isTrailer;
   final String? embedContent;
-  final Key? key;
   final VoidCallback? onVideoEnd;
   final ValueChanged<VideoPlaybackHandle>? onPlaybackHandleReady;
 
   VideoWidget({
+    Key? key,
     required this.videoURL,
     this.watchedTime,
     required this.videoType,
@@ -37,9 +37,8 @@ class VideoWidget extends StatelessWidget {
     required this.isTrailer,
     this.embedContent,
     this.onVideoEnd,
-    this.key,
     this.onPlaybackHandleReady,
-  });
+  }) : super(key: key);
 
   bool _isValidHttpUrl(String url) {
     final value = url.validate().trim();
@@ -208,6 +207,7 @@ class VideoWidget extends StatelessWidget {
         onTap?.call();
       },
       child: VideoPlayerWidget(
+        key: ValueKey('live-$videoId-$videoURL'),
         videoURL: videoURL.validate(),
         watchedTime: '',
         videoType: videoType,
@@ -295,6 +295,7 @@ class VideoWidget extends StatelessWidget {
           onTap?.call();
         },
         child: VideoPlayerWidget(
+          key: ValueKey('regular-$videoId-$videoURL'),
           videoURL: videoURL.validate(),
           watchedTime: watchedTime.validate(),
           videoType: videoType,

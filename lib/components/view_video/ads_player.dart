@@ -53,6 +53,7 @@ class _AdVideoPlayerWidgetState extends State<AdVideoPlayerWidget> with VideoPla
   List<Widget> overlayWidgets = [];
 
   PodPlayerController? _adController;
+  bool _hasStreamController = false;
 
   late final AdStateNotifier _adStateNotifier;
 
@@ -157,6 +158,7 @@ class _AdVideoPlayerWidgetState extends State<AdVideoPlayerWidget> with VideoPla
         isLooping: false,
       ),
     );
+    _hasStreamController = true;
 
     registerController(_streamController);
 
@@ -179,6 +181,41 @@ class _AdVideoPlayerWidgetState extends State<AdVideoPlayerWidget> with VideoPla
       ErrorHandler.handlePlayerError(error, 'stream_controller_init');
       if (mounted) setState(() {});
     });
+  }
+
+  @override
+  void didUpdateWidget(covariant AdVideoPlayerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    final bool sourceChanged = oldWidget.streamUrl != widget.streamUrl || oldWidget.postType != widget.postType || oldWidget.videoId != widget.videoId;
+    if (!sourceChanged) return;
+
+    // Clean up current controllers and timers
+    _stopFullscreenStateChecker();
+    _stopSessionValidationTimer();
+    _disposeAdController();
+    try {
+      if (_hasStreamController) _streamController.dispose();
+    } catch (e) {
+      log('AdVideoPlayerWidget - Error disposing stream controller: $e');
+    }
+
+    // Reset state flags
+    _hasStreamController = false;
+    _adsCompleted = false;
+    _midRollTimerStarted = false;
+    _postRollAdShown = false;
+    _isVideoAdPlaying = false;
+    _adsOnlyMode = widget.streamUrl.getURLType() == VideoType.typeYoutube;
+    _hasSeekedToWatchedTime = false;
+    overlayWidgets.clear();
+
+    // Reinitialize for new source
+    if (_adsOnlyMode) {
+      _startAdsOnlyFlow();
+    } else {
+      _initializeStreamPlayer();
+    }
   }
 
   Future<void> _startAdsOnlyFlow() async {
